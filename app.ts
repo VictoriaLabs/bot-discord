@@ -7,7 +7,7 @@ const app = express();
 const port = process.env.PORT;
 
 app.get('/', (req, res) => {
-  res.send('Express Bot make marche');
+  res.send('Express Bot');
 });
 
 app.listen(port, () => {
