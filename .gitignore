@@ -4,3 +4,5 @@
 /.idea/modules.xml
 /.idea/vcs.xml
 /.idea/victoria-discord.iml
+/src/.env
+src/dist
