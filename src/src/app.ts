@@ -3,6 +3,8 @@ import * as dotenv from 'dotenv';
 import {SlashCommand} from "./types";
 import { join } from 'path';
 import {readdirSync} from "fs";
+import {io, Socket} from 'socket.io-client';
+import {sendProgrammedMessage} from "./utils/on-programmed-message";
 
 dotenv.config();
 
@@ -38,3 +40,9 @@ readdirSync(handlerDirs).forEach(file => {
 });
 
 discordClient.login(process.env.DISCORD_TOKEN);
+
+const ws: Socket = io('http://localhost:3000');
+
+ws.on('embed', (arg): void => {
+    sendProgrammedMessage(arg, discordClient);
+})

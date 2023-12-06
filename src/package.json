@@ -4,7 +4,8 @@
   "main": "src/src/app.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node /usr/src/app/dist/app.js"
+    "start": "node /usr/src/app/dist/app.js",
+    "startwin": "node ./dist/app.js"
   },
   "repository": {
     "type": "git",
