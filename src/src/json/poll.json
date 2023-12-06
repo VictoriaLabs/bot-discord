@@ -12,7 +12,18 @@
         "text": "username ",
         "icon_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Flat_tick_icon.svg/1024px-Flat_tick_icon.svg.png"
       },
-      "timestamp": "2023-11-02T23:00:00.000Z"
+      "timestamp": "2020-12-06T10:15:00.000Z",
+      "reactions": [
+        {
+          "emoji": "👍",
+          "count": 0
+        },
+        {
+          "emoji": "👎",
+          "count": 0
+        }
+      ],
+      "deadline": "2023-12-06T10:35:00.000Z"
     }
   ],
   "components": [],
