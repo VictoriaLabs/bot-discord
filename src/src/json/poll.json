@@ -1,4 +1,10 @@
 {
+  "guild": "1171832529486094369",
+  "channel": "1174298231413411841",
+  "process": {
+    "id": "1",
+    "status": "pending"
+  },
   "content": "test **bold text**",
   "tts": false,
   "embeds": [
