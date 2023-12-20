@@ -1,4 +1,5 @@
 import { SlashCommand } from "../types";
+import client from "../app";
 import { CommandInteraction, EmbedBuilder, GuildMember, Message, MessageReaction, SlashCommandBuilder, TextChannel, User } from "discord.js";
 import { calculatePollTimeLeft } from "../utils/utils";
 import fs from "fs";
@@ -18,6 +19,8 @@ interface EmbedData {
   data: any;
   description: string;
   interaction: CommandInteraction;
+  guildId: string;
+  channelId: string;
 }
 
 interface PermissionData {
@@ -67,16 +70,20 @@ const createDescription = async ({ description, choices, reactions, deadlineMome
 };
 
 //--- EMBED ---//
-const sendEmbed = async ({ data, description, interaction }: EmbedData) => {
-  const embed: EmbedBuilder = new EmbedBuilder({
+const sendEmbed = async ({ data, description, guildId, channelId }: EmbedData) => {
+  const embed = new EmbedBuilder({
     ...data.embeds[0],
     description,
   });
 
-  const message = await interaction.reply({
+  const guild = client.guilds.cache.get(guildId);
+  if (!guild) {
+    throw new Error(`Guild with id ${guildId} not found`);
+  }
+  const channel = guild.channels.cache.get(channelId) as TextChannel;
+
+  const message = await channel.send({
     embeds: [embed],
-    ephemeral: false,
-    fetchReply: true,
   });
 
   return message;
@@ -149,62 +156,78 @@ const handleRemoveReactions = async (reaction: MessageReaction, user: User) => {
   }
 };
 
+//-------------------- EXPORTS --------------------//
+
+//--- MAIN FUNCTION ---//
+export const createPoll = async (): Promise<void> => {
+  try {
+    const rawData: string = fs.readFileSync("/usr/src/app/src/json/poll.json", "utf8");
+    const data = JSON.parse(rawData);
+
+    //--- DATA ---//
+    let { description, choices, reactions, deadline, multiple } = data.embeds[0];
+    const guildId: string = data.guild;
+    const channelId: string = data.channel;
+
+    const interaction = data;
+    const deadlineDate = new Date(deadline);
+    const deadlineMoment = moment(deadlineDate).tz("Europe/Paris").locale("fr");
+    const couldown = calculatePollTimeLeft(deadlineDate);
+
+    description = await createDescription({ description, choices, reactions, deadlineMoment, multiple });
+    const message = await sendEmbed({ data, description, guildId, channelId, interaction });
+    await removeEveryonePermission({ message });
+
+    //--- COLLECTOR ---//
+    const filter = (reaction: MessageReaction, user: User | GuildMember) => {
+      return user instanceof User && !user.bot;
+    };
+
+    //--- REACTIONS ---//
+    for (const reaction of reactions) {
+      await message.react(reaction.emoji);
+    }
+
+    const collector = message.createReactionCollector({
+      filter,
+      time: couldown,
+    });
+
+    // on reaction add
+    collector.on("collect", async (reaction, user) => {
+      if (!user.bot) {
+        await handleOnReactions(reaction, user, multiple, message, data);
+        await updatedDescription(message, data, multiple);
+      }
+    });
+
+    // on reaction remove
+    collector.on("remove", async (reaction, user) => {
+      if (!user.bot) {
+        await handleRemoveReactions(reaction, user);
+        await updatedDescription(message, data, multiple);
+      }
+    });
+
+    //--- TIMEOUT ---//
+    setTimeout(() => {
+      collector.stop();
+      userChoiceMap.clear();
+      message.delete();
+    }, couldown);
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+//--- COMMANDE ---//
 export const command: SlashCommand = {
   name: "poll",
   data: new SlashCommandBuilder().setName("poll").setDescription("Créer un sondage"),
 
   execute: async (interaction: CommandInteraction): Promise<void> => {
     try {
-      const rawData: string = fs.readFileSync("/usr/src/app/src/json/poll.json", "utf8");
-      const data = JSON.parse(rawData);
-
-      //--- DATA ---//
-      let { description, choices, reactions, deadline, multiple } = data.embeds[0];
-      const deadlineDate = new Date(deadline);
-      const deadlineMoment = moment(deadlineDate).tz("Europe/Paris").locale("fr");
-      const couldown = calculatePollTimeLeft(deadlineDate);
-
-      description = await createDescription({ description, choices, reactions, deadlineMoment, multiple });
-      const message = await sendEmbed({ data, description, interaction });
-      await removeEveryonePermission({ message });
-
-      //--- COLLECTOR ---//
-      const filter = (reaction: MessageReaction, user: User | GuildMember) => {
-        return user instanceof User && !user.bot;
-      };
-
-      //--- REACTIONS ---//
-      for (const reaction of reactions) {
-        await message.react(reaction.emoji);
-      }
-
-      const collector = message.createReactionCollector({
-        filter,
-        time: couldown,
-      });
-
-      // on reaction add
-      collector.on("collect", async (reaction, user) => {
-        if (!user.bot) {
-          await handleOnReactions(reaction, user, multiple, message, data);
-          await updatedDescription(message, data, multiple);
-        }
-      });
-
-      // on reaction remove
-      collector.on("remove", async (reaction, user) => {
-        if (!user.bot) {
-          await handleRemoveReactions(reaction, user);
-          await updatedDescription(message, data, multiple);
-        }
-      });
-
-      // time is up
-      setTimeout(() => {
-        collector.stop();
-        userChoiceMap.clear();
-        message.delete();
-      }, couldown);
+      createPoll();
     } catch (error) {
       console.error(error);
     }
