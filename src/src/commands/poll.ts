@@ -5,9 +5,122 @@ import fs from "fs";
 import moment from "moment-timezone";
 import "moment/locale/fr";
 
+//--- INTERFACES ---//
+interface CommandData {
+  description: string;
+  choices: string[];
+  reactions: MessageReaction[];
+  deadlineMoment: moment.Moment;
+  multiple: boolean;
+}
+
+interface EmbedData {
+  data: any;
+  description: string;
+  interaction: CommandInteraction;
+}
+
+interface PermissionData {
+  message: Message;
+}
+
 const userChoiceMap = new Map<User, MessageReaction[]>();
 
-const handleOnReactions = async (reaction: MessageReaction, user: User, message: Message, multiple: boolean) => {
+//--- DESCRIPTION ---//
+const createDescription = async ({ description, choices, reactions, deadlineMoment, multiple }: CommandData) => {
+  description += "**Choix**";
+  for (let i = 0; i < choices.length; i++) {
+    description += `\n${reactions[i].emoji}  ${choices[i]} `;
+  }
+
+  description += "\n\n**Résultats**\n";
+
+  let totalVotes = 0;
+  for (const reaction of reactions) {
+    if (!reaction.me) {
+      totalVotes += reaction.count - 1;
+    }
+  }
+
+  for (let i = 0; i < choices.length; i++) {
+    const percentage = ((reactions[i].count - 1) / totalVotes) * 100 || 0;
+    let progressBar = "";
+    for (let j = 0; j < percentage / 10; j++) {
+      progressBar += "▓";
+    }
+    for (let j = 0; j < 10 - percentage / 10; j++) {
+      progressBar += "░";
+    }
+    let emoji = reactions[i].emoji;
+    let countVotes = Math.abs(reactions[i].count - 1);
+    let percentageVotes = percentage.toFixed(0);
+    description += `${emoji}  ${progressBar}  [${countVotes}  •  ${percentageVotes}%]\n`;
+  }
+
+  description += `Total votes : ${Math.abs(totalVotes)}`;
+
+  description += "\n\n**Infos**\n";
+  description += `⏰  Fin : ${deadlineMoment.format("dddd D MMMM YYYY")} à ${deadlineMoment.format("HH:mm")}\n`;
+  description += `🔢  Choix : ${multiple ? "multiple" : "unique"}\n\n  `;
+
+  return description;
+};
+
+//--- EMBED ---//
+const sendEmbed = async ({ data, description, interaction }: EmbedData) => {
+  const embed: EmbedBuilder = new EmbedBuilder({
+    ...data.embeds[0],
+    description,
+  });
+
+  const message = await interaction.reply({
+    embeds: [embed],
+    ephemeral: false,
+    fetchReply: true,
+  });
+
+  return message;
+};
+
+//--- UPDATE DESCRIPTION ---//
+const updatedDescription = async (message: Message, data: any, multiple: boolean) => {
+  try {
+    const reactions = message.reactions.cache;
+
+    let updatedDescription = await createDescription({
+      description: data.embeds[0].description,
+      choices: data.embeds[0].choices,
+      reactions: Array.from(reactions.values()),
+      deadlineMoment: moment(data.embeds[0].deadline),
+      multiple,
+    });
+
+    const embed: EmbedBuilder = new EmbedBuilder({
+      ...data.embeds[0],
+      description: updatedDescription,
+    });
+
+    await message.edit({
+      embeds: [embed],
+    });
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+//--- Remove @everyone's permission to add reactions ---//
+const removeEveryonePermission = async ({ message }: PermissionData) => {
+  if (message.guild && message.channel instanceof TextChannel) {
+    const everyoneRole = message.guild.roles.everyone;
+
+    message.channel.permissionOverwrites.edit(everyoneRole, {
+      AddReactions: false,
+    });
+  }
+};
+
+//--- ON REACTIONS ---//
+const handleOnReactions = async (reaction: MessageReaction, user: User, multiple: boolean, message: Message, data: any) => {
   const userReactions = userChoiceMap.get(user);
 
   if (userReactions) {
@@ -24,7 +137,8 @@ const handleOnReactions = async (reaction: MessageReaction, user: User, message:
   }
 };
 
-const handleRemoveReactions = async (reaction: MessageReaction, user: User, message: Message, multiple: boolean) => {
+//--- REMOVE REACTIONS ---//
+const handleRemoveReactions = async (reaction: MessageReaction, user: User) => {
   const userReactions = userChoiceMap.get(user);
 
   if (userReactions) {
@@ -42,56 +156,28 @@ export const command: SlashCommand = {
   execute: async (interaction: CommandInteraction): Promise<void> => {
     try {
       const rawData: string = fs.readFileSync("/usr/src/app/src/json/poll.json", "utf8");
-      let data = JSON.parse(rawData);
+      const data = JSON.parse(rawData);
 
+      //--- DATA ---//
       let { description, choices, reactions, deadline, multiple } = data.embeds[0];
-
-      // deadline
       const deadlineDate = new Date(deadline);
       const deadlineMoment = moment(deadlineDate).tz("Europe/Paris").locale("fr");
       const couldown = calculatePollTimeLeft(deadlineDate);
 
-      // description
-      description += "**Choices**";
-      for (let i = 0; i < choices.length; i++) {
-        description += `\n${reactions[i].emoji}  ${choices[i]} `;
-      }
-      description += "\n\n**Settings**\n";
-      description += `⏰  Fin : ${deadlineMoment.format("dddd D MMMM YYYY")} à ${deadlineMoment.format("HH:mm")}\n`;
-      description += `🔢  Choix : ${multiple ? "multiple" : "unique"}\n\n`;
+      description = await createDescription({ description, choices, reactions, deadlineMoment, multiple });
+      const message = await sendEmbed({ data, description, interaction });
+      await removeEveryonePermission({ message });
 
-      // create embed
-      const embed: EmbedBuilder = new EmbedBuilder({
-        ...data.embeds[0],
-        description,
-      });
-
-      const message = await interaction.reply({
-        embeds: [embed],
-        ephemeral: false,
-        fetchReply: true,
-      });
-
-      // add reactions
-      for (const reaction of reactions) {
-        await message.react(reaction.emoji);
-      }
-
-      // remove everyone's permission to add reactions
-      if (message.guild && message.channel instanceof TextChannel) {
-        const everyoneRole = message.guild.roles.everyone;
-
-        message.channel.permissionOverwrites.edit(everyoneRole, {
-          AddReactions: false,
-        });
-      }
-
-      // filter for reactions
+      //--- COLLECTOR ---//
       const filter = (reaction: MessageReaction, user: User | GuildMember) => {
         return user instanceof User && !user.bot;
       };
 
-      // collector for reactions
+      //--- REACTIONS ---//
+      for (const reaction of reactions) {
+        await message.react(reaction.emoji);
+      }
+
       const collector = message.createReactionCollector({
         filter,
         time: couldown,
@@ -99,12 +185,18 @@ export const command: SlashCommand = {
 
       // on reaction add
       collector.on("collect", async (reaction, user) => {
-        await handleOnReactions(reaction, user, message, multiple);
+        if (!user.bot) {
+          await handleOnReactions(reaction, user, multiple, message, data);
+          await updatedDescription(message, data, multiple);
+        }
       });
 
       // on reaction remove
       collector.on("remove", async (reaction, user) => {
-        await handleRemoveReactions(reaction, user, message, multiple);
+        if (!user.bot) {
+          await handleRemoveReactions(reaction, user);
+          await updatedDescription(message, data, multiple);
+        }
       });
 
       // time is up
