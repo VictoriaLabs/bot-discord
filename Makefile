@@ -1,5 +1,4 @@
 run:
 	docker-compose up -d
-
 stop:
-	docker stop bot-discord-app-1
+	docker stop Discord-Bot-bun-1
