@@ -1,0 +1,25 @@
+{
+  "guild": "1059949664096506006",
+  "channel": "1059949664096506009",
+  "process": {
+    "id": "1",
+    "status": "pending"
+  },
+  "content": "",
+  "tts": false,
+  "embeds": [
+    {
+      "id": 183203664,
+      "description": "Tu vas nous manquer. 😢",
+      "fields": [],
+      "color": 5133495,
+      "timestamp": "",
+      "title": "🚪 ➜ {member} nous a quitté ! ",
+      "image": {
+        "url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFPX3If-y5nLhFyA3Qg5CDZCoxkJR6gAbngw&usqp=CAU"
+      }
+    }
+  ],
+  "components": [],
+  "actions": {}
+}
