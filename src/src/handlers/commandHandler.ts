@@ -24,10 +24,10 @@ const registerCommands = async (client: Client, commandsDir: string): Promise<vo
 
     readCommands(commandsDir);
 
-    const rest: REST = new REST({ version: '10' }).setToken(Bun.env.TOKEN);
+    const rest: REST = new REST({ version: '10' }).setToken('MTE3MTgzMTk2MzM2NDEwNjM2Mg.Go09W4.n4-ldFJYeyc849xLYtKko_1EZj8H-G5z7oNpy8');
 
     try {
-        await rest.put(Routes.applicationCommands(<Snowflake>Bun.env.CLIENT_ID), { body });
+        await rest.put(Routes.applicationCommands(<Snowflake>'1171831963364106362'), { body });
     } catch (error) {
         console.error(error);
     }
