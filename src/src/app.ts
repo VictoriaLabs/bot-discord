@@ -26,7 +26,7 @@ readdirSync(handlerDirs).forEach(async file => {
     handler.default(discordClient);
 });
 
-discordClient.login('MTE3MTgzMTk2MzM2NDEwNjM2Mg.Go09W4.n4-ldFJYeyc849xLYtKko_1EZj8H-G5z7oNpy8');
+discordClient.login(process.env.TOKEN);
 
 const webSocket: Socket = io('http://localhost:3000');
 
