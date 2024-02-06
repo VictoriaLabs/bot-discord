@@ -2,6 +2,7 @@ import { Client, Collection, GatewayIntentBits } from "discord.js";
 import type { SlashCommand } from "./types";
 import { join } from "path/posix";
 import { readdirSync } from "fs";
+import { io, Socket } from "socket.io-client";
 
 export const discordClient: Client = new Client({
   intents: [
@@ -25,4 +26,16 @@ readdirSync(handlerDirs).forEach(async (file) => {
   handler.default(discordClient);
 });
 
-discordClient.login(Bun.env.TOKEN);
+discordClient.login(process.env.TOKEN);
+
+const webSocket: Socket = io('http://localhost:3000');
+
+webSocket.on('message', (data) => {
+   const { type, payload } = data;
+
+   switch (type) {
+       case "pre-programmed-message":
+           console.log(`Je reçois un message pre-programmé`);
+           console.log(`Exemple pour get l'id de la guild: ${payload.data.guild}`);
+   }
+});
