@@ -1,7 +1,7 @@
 import fs from "fs";
 import { discordClient } from "../../app";
 import { EmbedBuilder, TextChannel, Message } from "discord.js";
-import { addReactions, createPollEmbeb, sendPollEmbed } from "./displayPoll";
+import { addReactions, createPollEmbed, sendPollEmbed } from "./displayPoll";
 import { removeMessageAfterDeadline } from "./removePoll";
 import { removeEveryonePermission } from "../reactPermission";
 import { collectorReaction } from "./collectorReactionsPoll";
@@ -40,7 +40,7 @@ export async function poll() {
   const userChoiceMap = new Map();
 
   // DISPLAY POLL
-  const embedMessage: EmbedBuilder = await createPollEmbeb(allData);
+  const embedMessage: EmbedBuilder = await createPollEmbed(allData);
   const message: Message = await sendPollEmbed(embedMessage, channel);
   await addReactions(message, allData.reactions);
 

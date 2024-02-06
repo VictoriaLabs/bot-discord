@@ -29,7 +29,7 @@ export function initializeDescription(data: any) {
 }
 
 //--- CREATE EMBED ---//
-export async function createPollEmbeb(data: any): Promise<EmbedBuilder> {
+export async function createPollEmbed(data: any): Promise<EmbedBuilder> {
   const description = initializeDescription(data);
 
   const embed = new EmbedBuilder({
