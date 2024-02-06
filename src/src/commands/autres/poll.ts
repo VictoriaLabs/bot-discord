@@ -8,11 +8,12 @@ export const command: SlashCommand = {
   execute: async (interaction: CommandInteraction): Promise<void> => {
     try {
       await interaction.deferReply();
-      setTimeout(async () => {
+      setTimeout(async (): Promise<void> => {
         await poll();
         await interaction.deleteReply();
       }, 3000);
     } catch (error) {
+      // TODO: Send the error to GlitchTip
       console.error(`Erreur lors de l'envoi du message : ${error}`);
     }
   },

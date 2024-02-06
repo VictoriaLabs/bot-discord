@@ -1,6 +1,6 @@
 import { Message } from "discord.js";
 import { type Moment } from "moment-timezone";
-import { timeLeft } from "../timeLeft";
+import { timeLeft } from "../others/timeLeft.ts";
 import "moment/locale/fr";
 
 export async function removeMessageAfterDeadline(message: Message, deadline: Moment) {

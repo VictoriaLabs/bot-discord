@@ -11,6 +11,7 @@ export const command: SlashCommand = {
         ephemeral: true,
       });
     } catch (error) {
+      // TODO: Send the error to GlitchTip
       console.error(error);
     }
   },

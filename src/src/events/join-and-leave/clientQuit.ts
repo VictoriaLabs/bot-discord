@@ -1,4 +1,4 @@
-import { Events, GuildMember, TextChannel } from "discord.js";
+import {type EmbedBuilder, Events, GuildMember, TextChannel} from "discord.js";
 import { createLeaveEmbed } from "../../utils/join-and-leave/clientLeaveEmbed.ts";
 import type { BotEvent } from "../../types";
 import fs from "fs";
@@ -12,11 +12,11 @@ const event: BotEvent = {
 
     let { title, description, color } = data.embeds[0];
     const channelId: string = data.channel;
-    const channel = member.guild.channels.cache.get(channelId) as TextChannel;
+    const channel: TextChannel = member.guild.channels.cache.get(channelId) as TextChannel;
 
     if (channel) {
       try {
-        createLeaveEmbed(member, title, description, color).then((embed) => {
+        createLeaveEmbed(member, title, description, color).then((embed: EmbedBuilder): void => {
           channel.send({ embeds: [embed] });
         });
       } catch (error) {

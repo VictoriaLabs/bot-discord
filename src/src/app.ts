@@ -3,6 +3,7 @@ import type { SlashCommand } from "./types";
 import { join } from "path/posix";
 import { readdirSync } from "fs";
 import { io, Socket } from "socket.io-client";
+import {sendPreProgrammedMessage} from "./utils/preprogrammed-message/preprogrammed-message.ts";
 
 export const discordClient: Client = new Client({
   intents: [
@@ -21,21 +22,21 @@ discordClient.commands = new Collection<string, SlashCommand>();
 const __dirname: string = new URL(".", import.meta.url).pathname;
 const handlerDirs: string = join(__dirname, "./handlers");
 
-readdirSync(handlerDirs).forEach(async (file) => {
+readdirSync(handlerDirs).forEach(async (file): Promise<void> => {
   const handler = await import(`${handlerDirs}/${file}`);
   handler.default(discordClient);
 });
 
 discordClient.login(process.env.TOKEN);
 
-const webSocket: Socket = io('http://localhost:3000');
+export const webSocket: Socket = io('http://localhost:3000');
 
-webSocket.on('message', (data) => {
-   const { type, payload } = data;
+// Handle incoming messages from the web socket server
+webSocket.on('message', async (data): Promise<void> => {
+    const {type, payload} = data;
 
-   switch (type) {
-       case "pre-programmed-message":
-           console.log(`Je reçois un message pre-programmé`);
-           console.log(`Exemple pour get l'id de la guild: ${payload.data.guild}`);
-   }
+    switch (type) {
+        case "pre-programmed-message":
+            await sendPreProgrammedMessage(payload.data);
+    }
 });
