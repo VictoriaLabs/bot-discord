@@ -1,5 +1,5 @@
 import { User, type Message, type MessageReaction } from "discord.js";
-import { timeLeft } from "../timeLeft";
+import { timeLeft } from "../others/timeLeft.ts";
 import { updateDescription } from "./updatePoll";
 
 //--- COLLECTOR REACTION ---//

@@ -3,7 +3,7 @@ import { discordClient } from "../../app";
 import { EmbedBuilder, TextChannel, Message } from "discord.js";
 import { addReactions, createPollEmbed, sendPollEmbed } from "./displayPoll";
 import { removeMessageAfterDeadline } from "./removePoll";
-import { removeEveryonePermission } from "../reactPermission";
+import { removeEveryonePermission } from "../others/reactPermission.ts";
 import { collectorReaction } from "./collectorReactionsPoll";
 import moment from "moment-timezone";
 import "moment/locale/fr";
@@ -51,5 +51,5 @@ export async function poll() {
   await collectorReaction(message, allData, userChoiceMap);
 
   // REMOVE MESSAGE AFTER DEADLINE
-  removeMessageAfterDeadline(message, allData.deadline);
+  await removeMessageAfterDeadline(message, allData.deadline);
 }

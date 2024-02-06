@@ -17,6 +17,7 @@ const event: BotEvent = {
 
             console.log(`Je suis actuellement en ligne en tant que ${client.user?.tag}`);
         } catch (error) {
+            // TODO: Send the error to GlitchTip
             console.error(error);
         }
     }
