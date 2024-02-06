@@ -1,0 +1,26 @@
+{
+  "guild": "1171832529486094369",
+  "channel": "1197131152805339176",
+  "reglement": "1197139065431150662",
+  "process": {
+    "id": "1",
+    "status": "pending"
+  },
+  "content": "test **bold text**",
+  "tts": false,
+  "embeds": [
+    {
+      "id": 652627557,
+      "title": "➜ Nouvel arrivant ! 🚀",
+      "description": "● Bienvenue {member} !\n● N'oublie pas de lire le {reglement} \n● Il y a désormais {memberCount} membres sur le serveur",
+      "color": 1866865,
+      "fields": [],
+      "timestamp": "",
+      "thumbnail": {
+        "url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFPX3If-y5nLhFyA3Qg5CDZCoxkJR6gAbngw&usqp=CAU"
+      }
+    }
+  ],
+  "components": [],
+  "actions": {}
+}

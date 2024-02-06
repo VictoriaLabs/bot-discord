@@ -1,0 +1,43 @@
+{
+  "guild": "1059949664096506006",
+  "channel": "1059949664096506009",
+  "process": {
+    "id": "1",
+    "status": "pending"
+  },
+  "content": "",
+  "tts": false,
+  "embeds": [
+    {
+      "id": 0,
+      "title": "📊 Question",
+      "description": "",
+      "color": 6626902,
+      "fields": [],
+      "footer": {
+        "text": "username ",
+        "icon_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Flat_tick_icon.svg/1024px-Flat_tick_icon.svg.png"
+      },
+      "timestamp": "",
+      "choices": ["choice 1", "choice 2", "choice 3"],
+      "multiple": false,
+      "reactions": [
+        {
+          "emoji": "👍",
+          "count": 0
+        },
+        {
+          "emoji": "👎",
+          "count": 0
+        },
+        {
+          "emoji": "🤷",
+          "count": 0
+        }
+      ],
+      "deadline": "2024-01-21T22:00:00.000Z"
+    }
+  ],
+  "components": [],
+  "actions": {}
+}

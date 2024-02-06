@@ -1,9 +1,9 @@
-version: '3.3'
+version: "3.3"
 services:
   bun:
     build: .
     ports:
-      - '8090:8090'
+      - "8090:8090"
     volumes:
       - ./src:/usr/src/app
     command: bash -c "bun install && bun run src/app.ts"
