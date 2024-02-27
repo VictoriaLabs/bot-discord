@@ -1,6 +1,7 @@
 import type {PreProgrammedPayloadData} from "../../types";
 import {discordClient, webSocket} from "../../app.ts";
 import type {Guild, GuildBasedChannel, TextChannel} from "discord.js";
+import Sentry from "@sentry/node";
 
 /**
  * Send a pre-programmed message to a specific channel on a specific guild
@@ -34,17 +35,34 @@ export async function sendPreProgrammedMessage(data: PreProgrammedPayloadData): 
                     })
                 }
             } else {
-                // TODO: Send the error to GlitchTip
+                Sentry.captureException(new Error("The chanel doesn't exist in the server !"), (scope) => {
+                    scope.setContext("function", {
+                        name: "removeEveryonePermission",
+                        discord_Server_Id: `${data.guild}`,
+                        discord_Channel_Id: `${data.channel}`,
+                    });
+                    return scope;
+                });
                 console.error(`Le channel n'existe pas sur le serveur avec l'id: ${data.guild}`);
                 return;
             }
         } else {
-            // TODO: Send the error to GlitchTip
-            console.error(`Le bot n'est pas sur le serveur avec l'id: ${data.guild}`);
+            Sentry.captureException(new Error("The bot isn't on the server !"), (scope) => {
+                scope.setContext("function", {
+                    name: "removeEveryonePermission",
+                    discord_Server_Id: `${data.guild}`,
+                });
+                return scope;
+            });
             return;
         }
     } catch (error) {
-        // TODO: Send the error to GlitchTip
+        Sentry.captureException(error, (scope) => {
+            scope.setContext("function", {
+                name: "sendPreProgrammedMessage",
+            });
+            return scope;
+        });
         console.error(error);
     }
 }

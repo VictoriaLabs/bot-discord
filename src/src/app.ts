@@ -4,6 +4,7 @@ import { join } from "path/posix";
 import { readdirSync } from "fs";
 import { io, Socket } from "socket.io-client";
 import {sendPreProgrammedMessage} from "./utils/preprogrammed-message/preprogrammed-message.ts";
+import Sentry from "@sentry/node";
 
 export const discordClient: Client = new Client({
   intents: [
@@ -16,6 +17,10 @@ export const discordClient: Client = new Client({
     GatewayIntentBits.GuildMessageReactions,
   ],
 });
+
+Sentry.init({
+    dsn: process.env.SENTRY_DSN,
+})
 
 discordClient.commands = new Collection<string, SlashCommand>();
 

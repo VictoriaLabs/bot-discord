@@ -1,5 +1,6 @@
 import type {BotEvent, SlashCommand} from "../types";
 import {Events, type Interaction} from "discord.js";
+import Sentry from "@sentry/node";
 
 const event: BotEvent = {
     name: Events.InteractionCreate,
@@ -14,7 +15,12 @@ const event: BotEvent = {
         try {
             await command.execute(interaction);
         } catch (error) {
-            console.error(error);
+            Sentry.captureException(error, (scope) => {
+                scope.setContext("event", {
+                    name: "interactionCreate",
+                });
+                return scope;
+            });
         }
     }
 }

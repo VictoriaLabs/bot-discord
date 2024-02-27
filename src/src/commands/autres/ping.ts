@@ -1,5 +1,7 @@
 import type { SlashCommand } from "../../types";
 import { type CommandInteraction, SlashCommandBuilder } from "discord.js";
+import Sentry, {type Scope} from "@sentry/node";
+import {sendErrorMessage} from "../../utils/others/errorMessage.ts";
 
 export const command: SlashCommand = {
   name: "ping",
@@ -11,8 +13,13 @@ export const command: SlashCommand = {
         ephemeral: true,
       });
     } catch (error) {
-      // TODO: Send the error to GlitchTip
-      console.error(error);
+      Sentry.captureException(error, (scope) => {
+        scope.setContext("command", {
+          name: "ping",
+        });
+        return scope;
+      });
+      await sendErrorMessage(interaction.replied, interaction);
     }
   },
 };

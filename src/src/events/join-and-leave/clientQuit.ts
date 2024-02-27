@@ -2,6 +2,7 @@ import {type EmbedBuilder, Events, GuildMember, TextChannel} from "discord.js";
 import { createLeaveEmbed } from "../../utils/join-and-leave/clientLeaveEmbed.ts";
 import type { BotEvent } from "../../types";
 import fs from "fs";
+import Sentry from "@sentry/node";
 
 const event: BotEvent = {
   name: Events.GuildMemberRemove,
@@ -20,7 +21,12 @@ const event: BotEvent = {
           channel.send({ embeds: [embed] });
         });
       } catch (error) {
-        console.error(`Erreur lors de la création de l'embed quit: ${error}`);
+        Sentry.captureException(error, (scope) => {
+          scope.setContext("event", {
+            name: "clientQuit",
+          });
+          return scope;
+        });
       }
     }
   },

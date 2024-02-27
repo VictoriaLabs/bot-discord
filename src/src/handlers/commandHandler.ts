@@ -1,6 +1,7 @@
 import {readdirSync, Stats, statSync} from "fs";
 import {join} from "path/posix";
 import {REST, Client, Routes, type Snowflake} from "discord.js";
+import Sentry from "@sentry/node";
 
 const registerCommands = async (client: Client, commandsDir: string): Promise<void> => {
     const body: any = [];
@@ -27,9 +28,14 @@ const registerCommands = async (client: Client, commandsDir: string): Promise<vo
     const rest: REST = new REST({ version: '10' }).setToken(process.env.TOKEN);
 
     try {
-        await rest.put(Routes.applicationCommands(<Snowflake>'1171831963364106362'), { body });
+        await rest.put(Routes.applicationCommands(<Snowflake>Bun.env.CLIENT_ID), { body });
     } catch (error) {
-        console.error(error);
+        Sentry.captureException(error, (scope) => {
+            scope.setContext("handler", {
+                name: "commandHandler",
+            });
+            return scope;
+        });
     }
 };
 
