@@ -1,4 +1,3 @@
-import fs from "fs";
 import { discordClient } from "../../app";
 import {EmbedBuilder, TextChannel, Message, type Guild} from "discord.js";
 import { addReactions, createPollEmbed, sendPollEmbed } from "./displayPoll";
@@ -8,10 +7,7 @@ import { collectorReaction } from "./collectorReactionsPoll";
 import moment from "moment-timezone";
 import "moment/locale/fr";
 
-export async function poll(): Promise<void> {
-  // READ JSON FILE
-  const rawData: string = fs.readFileSync("/usr/src/app/src/json/poll.json", "utf8");
-  const data = JSON.parse(rawData);
+export async function poll(data: any): Promise<void> {
 
   // VERIFY GUILD & CHANNEL
   const guild: Guild | undefined = discordClient.guilds.cache.get(data.guild);

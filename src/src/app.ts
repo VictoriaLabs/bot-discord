@@ -6,6 +6,7 @@ import { io, Socket } from "socket.io-client";
 import {sendPreProgrammedMessage} from "./utils/preprogrammed-message/preprogrammed-message.ts";
 import Sentry from "@sentry/node";
 import {kickMember} from "./utils/moderation/kick.ts";
+import {poll} from "./utils/poll/poll.ts";
 
 export const discordClient: Client = new Client({
   intents: [
@@ -51,6 +52,9 @@ webSocket.on('discordEvent', async (data): Promise<void> => {
             break;
         case "kick":
             await kickMember(payload.data);
+            break;
+        case "poll":
+            await poll(payload.data);
             break;
     }
 });
