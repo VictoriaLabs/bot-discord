@@ -1,6 +1,6 @@
 import fs from "fs";
 import { discordClient } from "../../app";
-import { EmbedBuilder, TextChannel, Message } from "discord.js";
+import {EmbedBuilder, TextChannel, Message, type Guild} from "discord.js";
 import { addReactions, createPollEmbed, sendPollEmbed } from "./displayPoll";
 import { removeMessageAfterDeadline } from "./removePoll";
 import { removeEveryonePermission } from "../others/reactPermission.ts";
@@ -8,17 +8,17 @@ import { collectorReaction } from "./collectorReactionsPoll";
 import moment from "moment-timezone";
 import "moment/locale/fr";
 
-export async function poll() {
+export async function poll(): Promise<void> {
   // READ JSON FILE
   const rawData: string = fs.readFileSync("/usr/src/app/src/json/poll.json", "utf8");
   const data = JSON.parse(rawData);
 
   // VERIFY GUILD & CHANNEL
-  const guild = discordClient.guilds.cache.get(data.guild);
+  const guild: Guild | undefined = discordClient.guilds.cache.get(data.guild);
   if (!guild) {
     throw new Error(`Aucune guilde trouvée avec l'ID ${data.guild}`);
   }
-  const channel = guild.channels.cache.get(data.channel) as TextChannel;
+  const channel: TextChannel = guild.channels.cache.get(data.channel) as TextChannel;
   if (!channel) {
     throw new Error(`Aucun salon trouvé avec l'ID ${data.channel}`);
   }
@@ -37,7 +37,7 @@ export async function poll() {
     deadline: moment(deadline).tz("Europe/Paris").locale("fr"),
   };
 
-  const userChoiceMap = new Map();
+  const userChoiceMap: Map<any, any> = new Map();
 
   // DISPLAY POLL
   const embedMessage: EmbedBuilder = await createPollEmbed(allData);

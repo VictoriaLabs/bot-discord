@@ -1,8 +1,8 @@
-import { EmbedBuilder, TextChannel, Message } from "discord.js";
+import {EmbedBuilder, Message, TextChannel} from "discord.js";
 
 //--- INITIALIZE DESCRIPTION ---//
-export function initializeDescription(data: any) {
-  let description = "";
+export function initializeDescription(data: any): string {
+  let description: string = "";
 
   description += "**Choix**";
   for (let i = 0; i < data.choices.length; i++) {
@@ -11,7 +11,7 @@ export function initializeDescription(data: any) {
 
   description += "\n\n**Résultats\n**";
   for (let i = 0; i < data.choices.length; i++) {
-    let progressBar = "";
+    let progressBar: string = "";
     for (let j = 0; j < 10; j++) {
       progressBar += "░";
     }
@@ -30,30 +30,26 @@ export function initializeDescription(data: any) {
 
 //--- CREATE EMBED ---//
 export async function createPollEmbed(data: any): Promise<EmbedBuilder> {
-  const description = initializeDescription(data);
+  const description: string = initializeDescription(data);
 
-  const embed = new EmbedBuilder({
+  return new EmbedBuilder({
     title: data.title,
     description: description,
     color: data.color,
     footer: data.footer,
     timestamp: data.timestamp,
   });
-
-  return embed;
 }
 
 //--- SEND EMBED ---//
 export async function sendPollEmbed(embed: EmbedBuilder, channel: TextChannel): Promise<Message> {
-  const message = await channel.send({
+  return await channel.send({
     embeds: [embed],
   });
-
-  return message;
 }
 
 //--- ADD REACTIONS ---//
-export async function addReactions(message: Message, reactions: any) {
+export async function addReactions(message: Message, reactions: any): Promise<void> {
   for (const reaction of reactions) {
     await message.react(reaction.emoji);
   }

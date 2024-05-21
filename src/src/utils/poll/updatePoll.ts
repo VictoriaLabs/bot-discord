@@ -1,7 +1,7 @@
-import { EmbedBuilder, Message } from "discord.js";
+import {EmbedBuilder, Message, type MessageReaction} from "discord.js";
 
-export async function updateDescription(message: Message, data: any) {
-  let description = "**Choix**";
+export async function updateDescription(message: Message, data: any): Promise<void> {
+  let description: string = "**Choix**";
 
   for (let i = 0; i < data.choices.length; i++) {
     description += `\n${data.reactions[i].emoji}  ${data.choices[i]} `;
@@ -9,13 +9,13 @@ export async function updateDescription(message: Message, data: any) {
 
   description += "\n\n**Résultats\n**";
 
-  const totalReactions = message.reactions.cache.reduce((total, reaction) => total + (reaction.count - 1), 0);
+  const totalReactions: number = message.reactions.cache.reduce((total, reaction) => total + (reaction.count - 1), 0);
 
   for (let i = 0; i < data.choices.length; i++) {
     // Get the reaction for the current choice
-    const reaction = message.reactions.cache.get(data.reactions[i].emoji);
+    const reaction: MessageReaction | undefined = message.reactions.cache.get(data.reactions[i].emoji);
     // Get the count of the reaction
-    const count = reaction ? reaction.count - 1 : 0; // Subtract 1 because the bot's own reaction is also counted
+    const count: number = reaction ? reaction.count - 1 : 0; // Subtract 1 because the bot's own reaction is also counted
     // Calculate the percentage of the total reactions this reaction represents
     const percentage = totalReactions > 0 ? Math.round((count / totalReactions) * 100) : 0;
 
@@ -34,7 +34,7 @@ export async function updateDescription(message: Message, data: any) {
   description += `⏰  Fin : ${data.deadline.format("dddd D MMMM YYYY")} à ${data.deadline.format("HH:mm")}\n`;
   description += `🔢  Choix : ${data.multiple ? "multiple" : "unique"}\n\n  `;
 
-  const newEmbed = new EmbedBuilder({
+  const newEmbed: EmbedBuilder = new EmbedBuilder({
     title: data.title,
     description,
     color: data.color,
@@ -42,7 +42,7 @@ export async function updateDescription(message: Message, data: any) {
     timestamp: data.timestamp,
   });
 
-  message.edit({
+  await message.edit({
     embeds: [newEmbed],
   });
 }

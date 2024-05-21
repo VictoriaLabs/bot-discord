@@ -2,6 +2,7 @@ import {type EmbedBuilder, Events, GuildMember, TextChannel} from "discord.js";
 import { createJoinEmbed } from "../../utils/join-and-leave/clientJoinEmbed.ts";
 import type { BotEvent } from "../../types";
 import fs from "fs";
+import Sentry from "@sentry/node";
 
 const event: BotEvent = {
   name: Events.GuildMemberAdd,
@@ -21,7 +22,12 @@ const event: BotEvent = {
           channel.send({ embeds: [embed] });
         });
       } catch (error) {
-        console.error(`Erreur lors de la création de l'embed Welcome: ${error}`);
+        Sentry.captureException(error, (scope) => {
+          scope.setContext("event", {
+            name: "clientJoin",
+          });
+          return scope;
+        });
       }
     }
   },

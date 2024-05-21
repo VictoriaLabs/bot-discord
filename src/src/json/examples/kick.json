@@ -1,0 +1,53 @@
+{
+  "data": {
+    "guild": "1171832529486094369",
+    "userToKick": "286589729628225536",
+    "moderator": "937758085047525446",
+    "reason": "Ceci est une raison pour une expulsion.",
+    "logs-channel": "1242478433997422592",
+    "actualChannel": "1242478433997422592",
+    "replyTo": "defer-id"
+  },
+  "message": {
+    "content": "",
+    "embeds": [
+      {
+        "id": 900646132,
+        "fields": [
+          {
+            "name": "Membre exclu",
+            "value": "${member}",
+            "inline": false
+          },
+          {
+            "name": "Identifiant du membre",
+            "value": "${member.id}",
+            "inline": false
+          },
+          {
+            "name": "Modérateur",
+            "value": "${moderator}"
+          },
+          {
+            "name": "Identifiant du modérateur",
+            "value": "${moderator.id}"
+          },
+          {
+            "name": "Raison",
+            "value": "${reason}"
+          }
+        ],
+        "title": "Exclusion",
+        "color": 16741120,
+        "thumbnail": {
+          "url": "https://img.freepik.com/vecteurs-libre/vecteur-degrade-logo-colore-oiseau_343694-1365.jpg?size=338&ext=jpg&ga=GA1.1.1546980028.1711411200&semt=ais"
+        },
+        "image": {
+          "url": "https://img.freepik.com/vecteurs-libre/vecteur-degrade-logo-colore-oiseau_343694-1365.jpg?size=338&ext=jpg&ga=GA1.1.1546980028.1711411200&semt=ais"
+        }
+      }
+    ],
+    "components": [],
+    "actions": {}
+  }
+}

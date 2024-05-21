@@ -1,5 +1,4 @@
 export function timeLeft(deadline: Date): number {
-  const now = new Date();
-  const difference = deadline.getTime() - now.getTime();
-  return difference;
+  const now: Date = new Date();
+  return deadline.getTime() - now.getTime();
 }

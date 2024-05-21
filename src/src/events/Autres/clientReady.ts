@@ -1,5 +1,6 @@
 import type {BotEvent} from "../../types";
 import {type Client, Events, ActivityType} from "discord.js";
+import Sentry from "@sentry/node";
 
 const event: BotEvent = {
     name: Events.ClientReady,
@@ -17,7 +18,12 @@ const event: BotEvent = {
 
             console.log(`Je suis actuellement en ligne en tant que ${client.user?.tag}`);
         } catch (error) {
-            // TODO: Send the error to GlitchTip
+            Sentry.captureException(error, (scope) => {
+                scope.setContext("event", {
+                    name: "clientReady",
+                });
+                return scope;
+            });
             console.error(error);
         }
     }

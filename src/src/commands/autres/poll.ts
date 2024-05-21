@@ -1,6 +1,8 @@
 import type { SlashCommand } from "../../types";
 import { CommandInteraction, SlashCommandBuilder } from "discord.js";
 import { poll } from "../../utils/poll/poll";
+import Sentry from "@sentry/node";
+import {sendErrorMessage} from "../../utils/others/errorMessage.ts";
 
 export const command: SlashCommand = {
   name: "poll",
@@ -13,8 +15,13 @@ export const command: SlashCommand = {
         await interaction.deleteReply();
       }, 3000);
     } catch (error) {
-      // TODO: Send the error to GlitchTip
-      console.error(`Erreur lors de l'envoi du message : ${error}`);
+      Sentry.captureException(error, (scope) => {
+        scope.setContext("command", {
+          name: "poll",
+        });
+        return scope;
+      });
+      await sendErrorMessage(interaction.replied, interaction);
     }
   },
 };

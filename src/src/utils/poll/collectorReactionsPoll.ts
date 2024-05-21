@@ -1,34 +1,32 @@
-import { User, type Message, type MessageReaction } from "discord.js";
+import {User, type Message, type MessageReaction, ReactionCollector} from "discord.js";
 import { timeLeft } from "../others/timeLeft.ts";
 import { updateDescription } from "./updatePoll";
 
 //--- COLLECTOR REACTION ---//
-export async function collectorReaction(message: Message, allData: any, userChoiceMap: Map<User, MessageReaction[]>) {
+export async function collectorReaction(message: Message, allData: any, userChoiceMap: Map<User, MessageReaction[]>): Promise<void> {
   const deadlineTime = allData.deadline.toDate();
-  const time = timeLeft(deadlineTime);
+  const time: number = timeLeft(deadlineTime);
 
   const filter = (reaction: MessageReaction, user: User) => {
-    return user instanceof User && !user.bot;
+    return !user.bot;
   };
 
-  const collector = message.createReactionCollector({ filter, time: time, dispose: true });
+  const collector: ReactionCollector = message.createReactionCollector({ filter, time: time, dispose: true });
 
-  collector.on("collect", async (reaction, user) => {
-    console.log(`Collected ${reaction.emoji.name} from ${user.tag}`);
+  collector.on("collect", async (reaction: MessageReaction, user: User): Promise<void> => {
     await handleOnReactions(reaction, user, userChoiceMap, allData);
     await updateDescription(message, allData);
   });
 
-  collector.on("remove", async (reaction, user) => {
-    console.log(`Removed ${reaction.emoji.name} from ${user.tag}`);
+  collector.on("remove", async (reaction: MessageReaction, user: User): Promise<void> => {
     await handleRemoveReactions(reaction, user, userChoiceMap, allData);
     await updateDescription(message, allData);
   });
 }
 
 //--- HANDLE ON REACTIONS ---//
-export async function handleOnReactions(reaction: MessageReaction, user: User, userChoiceMap: Map<User, MessageReaction[]>, allData: any) {
-  const userReactions = userChoiceMap.get(user);
+export async function handleOnReactions(reaction: MessageReaction, user: User, userChoiceMap: Map<User, MessageReaction[]>, allData: any): Promise<void> {
+  const userReactions: MessageReaction[] | undefined = userChoiceMap.get(user);
   const { multiple, reactions } = allData;
 
   if (userReactions) {
@@ -47,10 +45,10 @@ export async function handleOnReactions(reaction: MessageReaction, user: User, u
 
 //--- HANDLE REMOVE REACTIONS ---//
 export async function handleRemoveReactions(reaction: MessageReaction, user: User, userChoiceMap: Map<User, MessageReaction[]>, allData: any) {
-  const userReactions = userChoiceMap.get(user);
+  const userReactions: MessageReaction[] | undefined = userChoiceMap.get(user);
 
   if (userReactions) {
-    const index = userReactions.indexOf(reaction);
+    const index: number = userReactions.indexOf(reaction);
     if (index !== -1) {
       userReactions.splice(index, 1);
     }
