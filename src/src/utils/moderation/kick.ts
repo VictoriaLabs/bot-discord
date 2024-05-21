@@ -25,6 +25,8 @@ export async function kickMember(data: KickPayloadData): Promise<void> {
                         const moderator: GuildMember = guild.members.cache.get(data.moderator) as GuildMember;
                         if (logsChannel) {
                             if (moderator) {
+                                // Replace the variables in the message
+                                await replaceAllInObject(data.message, userToKick, moderator, data.reason);
                                 await logsChannel.send({
                                     content: !!data.message.content ? data.message.content : "",
                                     tts: false,
@@ -84,5 +86,27 @@ export async function kickMember(data: KickPayloadData): Promise<void> {
             return scope;
         });
         console.error(error);
+    }
+}
+
+/**
+ * Replace all the variables in the object
+ * @param obj - The object to replace the variables
+ * @param userToKick - The user to kick
+ * @param moderator - The moderator
+ * @param reason - The reason for the kick
+ */
+async function replaceAllInObject(obj: any, userToKick: GuildMember, moderator: GuildMember, reason: string): Promise<void> {
+    for (let key in obj) {
+        if (typeof obj[key] === 'string') {
+            obj[key] = obj[key]
+                .replace('${member}', `${userToKick.user.username}`)
+                .replace('${member.id}', `${userToKick.user.id}`)
+                .replace('${moderator}', `${moderator.user.username}`)
+                .replace('${moderator.id}', `${moderator.user.id}`)
+                .replace('${reason}', `${reason}`);
+        } else if (typeof obj[key] === 'object') {
+            await replaceAllInObject(obj[key], userToKick, moderator, reason);
+        }
     }
 }

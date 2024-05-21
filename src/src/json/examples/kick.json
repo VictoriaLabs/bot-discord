@@ -16,25 +16,25 @@
         "fields": [
           {
             "name": "Membre exclu",
-            "value": "Velris",
+            "value": "${member}",
             "inline": false
           },
           {
             "name": "Identifiant du membre",
-            "value": "937758085047525446",
+            "value": "${member.id}",
             "inline": false
           },
           {
             "name": "Modérateur",
-            "value": "Velris"
+            "value": "${moderator}"
           },
           {
             "name": "Identifiant du modérateur",
-            "value": "937758085047525446"
+            "value": "${moderator.id}"
           },
           {
             "name": "Raison",
-            "value": "Ceci est une raison pour une expulsion."
+            "value": "${reason}"
           }
         ],
         "title": "Exclusion",
