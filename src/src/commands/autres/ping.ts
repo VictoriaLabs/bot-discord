@@ -1,6 +1,6 @@
 import type { SlashCommand } from "../../types";
 import { type CommandInteraction, SlashCommandBuilder } from "discord.js";
-import Sentry, {type Scope} from "@sentry/node";
+import Sentry from "@sentry/node";
 import {sendErrorMessage} from "../../utils/others/errorMessage.ts";
 
 export const command: SlashCommand = {

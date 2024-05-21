@@ -1,6 +1,6 @@
 import type {PreProgrammedPayloadData} from "../../types";
 import {discordClient, webSocket} from "../../app.ts";
-import type {Guild, GuildBasedChannel, TextChannel} from "discord.js";
+import type {Guild, GuildBasedChannel} from "discord.js";
 import Sentry from "@sentry/node";
 
 /**
@@ -37,7 +37,7 @@ export async function sendPreProgrammedMessage(data: PreProgrammedPayloadData): 
             } else {
                 Sentry.captureException(new Error("The chanel doesn't exist in the server !"), (scope) => {
                     scope.setContext("function", {
-                        name: "removeEveryonePermission",
+                        name: "sendPreProgrammedMessage",
                         discord_Server_Id: `${data.guild}`,
                         discord_Channel_Id: `${data.channel}`,
                     });
@@ -49,7 +49,7 @@ export async function sendPreProgrammedMessage(data: PreProgrammedPayloadData): 
         } else {
             Sentry.captureException(new Error("The bot isn't on the server !"), (scope) => {
                 scope.setContext("function", {
-                    name: "removeEveryonePermission",
+                    name: "sendPreProgrammedMessage",
                     discord_Server_Id: `${data.guild}`,
                 });
                 return scope;

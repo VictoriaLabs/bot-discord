@@ -1,4 +1,4 @@
-import {Collection, CommandInteraction, Embed, SlashCommandBuilder, Snowflake} from "discord.js";
+import {Collection, CommandInteraction, type Message, SlashCommandBuilder, Snowflake} from "discord.js";
 
 declare module "bun" {
 
@@ -31,7 +31,18 @@ export interface PreProgrammedPayloadData {
     guild: string;
     channel: string;
     process: { id: number, status: string };
-    message: { content: string, tts: boolean, embeds: Embed[] };
+    message: Message;
+}
+
+export interface KickPayloadData {
+    guild: string;
+    userToKick: string;
+    moderator: string;
+    reason: string;
+    logsChannel: string;
+    actualChannel: string;
+    replyTo: string;
+    message: Message
 }
 
 export {};

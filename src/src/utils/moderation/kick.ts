@@ -1,0 +1,88 @@
+import type {KickPayloadData} from "../../types";
+import Sentry from "@sentry/node";
+import {discordClient} from "../../app.ts";
+import type {Guild, GuildBasedChannel, GuildMember, TextChannel} from "discord.js";
+
+/**
+ * Kick a member from the server
+ * @param data - The data to kick the member
+ * @returns {Promise<void>}
+ */
+export async function kickMember(data: KickPayloadData): Promise<void> {
+    try {
+        // Check if the bot is on the guild
+        if (discordClient.guilds.cache.get(data.guild) !== undefined) {
+            const guild: Guild = discordClient.guilds.cache.get(data.guild) as Guild;
+            // Check if the user to kick is on the server
+            const userToKick: GuildMember = await guild.members.fetch(data.userToKick);
+            if (userToKick) {
+                // Kick the user
+                await userToKick.kick(data.reason).then(async (): Promise<void> => {
+                    let channel: GuildBasedChannel | undefined = guild.channels.cache.get(data.logsChannel);
+                    if (channel?.isTextBased()) {
+                        // Log the kick in the logs channel
+                        const logsChannel: TextChannel = guild.channels.cache.get(data.logsChannel) as TextChannel;
+                        const moderator: GuildMember = guild.members.cache.get(data.moderator) as GuildMember;
+                        if (logsChannel) {
+                            if (moderator) {
+                                await logsChannel.send({
+                                    content: !!data.message.content ? data.message.content : "",
+                                    tts: false,
+                                    embeds: !!data.message.embeds ? data.message.embeds : [],
+                                });
+                                await channel.send({
+                                    content: `L'utilisateur a bien été expulsé.`,
+                                    reply: {
+                                        messageReference: data.replyTo,
+                                    },
+                                });
+                            } else {
+                                await channel.send({
+                                    content: `L'utilisateur a bien été expulsé. Mais le modérateur n'est pas sur le serveur.`,
+                                    reply: {
+                                        messageReference: data.replyTo,
+                                    },
+                                });
+                                return;
+                            }
+                        } else {
+                            await channel.send({
+                                content: `Le canal de logs n'existe pas sur le serveur. Mais l'utilisateur a bien été expulsé.`,
+                                reply: {
+                                    messageReference: data.replyTo,
+                                },
+                            });
+                            return;
+                        }
+                    }
+                });
+            } else {
+                // Respond to the moderator that the user isn't on the server
+                const channel: TextChannel = guild.channels.cache.get(data.actualChannel) as TextChannel;
+                await channel.send({
+                    content: `L'utilisateur n'est pas sur le serveur.`,
+                    reply: {
+                        messageReference: data.replyTo,
+                    },
+                });
+            }
+        } else {
+            Sentry.captureException(new Error("The bot isn't on the server !"), (scope) => {
+                scope.setContext("function", {
+                    name: "kickMember",
+                    discord_Server_Id: `${data.guild}`,
+                });
+                return scope;
+            });
+            return;
+        }
+    } catch (error) {
+        Sentry.captureException(error, (scope) => {
+            scope.setContext("function", {
+                name: "sendPreProgrammedMessage",
+            });
+            return scope;
+        });
+        console.error(error);
+    }
+}
