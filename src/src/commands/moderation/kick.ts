@@ -39,12 +39,14 @@ export const command: SlashCommand = {
                 webSocket.emit("discordEvent", {
                     type: "ask-kick",
                     payload: {
-                        guild: "1171832529486094369",
-                        userTokick: user.id,
-                        moderator: interaction.user.id,
-                        reason: reason,
-                        actualChannel: interaction.channelId,
-                        replyTo: interaction.id,
+                        data: {
+                            guild: "1171832529486094369",
+                            userTokick: user.id,
+                            moderator: interaction.user.id,
+                            reason: reason,
+                            actualChannel: interaction.channelId,
+                            replyTo: interaction.id
+                        }
                     }
                 });
             } catch (error) {
