@@ -47,7 +47,7 @@ webSocket.on("connect_error", (err) => {
   });
 
 webSocket.on('connect', () => {
-    webSocket.emit('test', "Hello from the client!")});
+    webSocket.emit('test', "Hello from the client!");
     console.log('Connected to the web socket server');
 })
 
