@@ -5,6 +5,7 @@ declare module "bun" {
     interface Env {
         TOKEN: string;
         CLIENT_ID: string | Snowflake;
+        WEBSOCKET_URL: string;
         SENTRY_DSN: string;
     }
 }

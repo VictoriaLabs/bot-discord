@@ -36,7 +36,7 @@ readdirSync(handlerDirs).forEach(async (file): Promise<void> => {
 
 discordClient.login(process.env.TOKEN);
 
-export const webSocket: Socket = io('http://192.168.54.201:8088');
+export const webSocket: Socket = io(Bun.env.WEBSOCKET_URL);
 
 webSocket.on('connect', () => {
     console.log('Connected to the web socket server');
