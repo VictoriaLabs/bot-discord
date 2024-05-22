@@ -47,13 +47,14 @@ webSocket.on("connect_error", (err) => {
   });
 
 webSocket.on('connect', () => {
+    webSocket.emit('discordEvent', {type: 'ready', payload: {data: 'Bot is ready'}});
     console.log('Connected to the web socket server');
 })
 
 // Handle incoming messages from the web socket server
 webSocket.on('discordEvent', async (data): Promise<void> => {
-    const {type, payload} = data;
     console.log(data);
+    const {type, payload} = data;
     
     switch (type) {
         case "pre-programmed-message":
