@@ -47,13 +47,13 @@ webSocket.on("connect_error", (err) => {
   });
 
 webSocket.on('connect', () => {
-    webSocket.emit('test', "Hello from the client!");
     console.log('Connected to the web socket server');
+    socket.emit('join', "discord");
 })
 
 // Handle incoming messages from the web socket server
 webSocket.on('discordEvent', async (data): Promise<void> => {
-    console.log(data);
+    await console.log(data);
     const {type, payload} = data;
     
     switch (type) {
@@ -67,8 +67,4 @@ webSocket.on('discordEvent', async (data): Promise<void> => {
             await poll(payload.data);
             break;
     }
-});
-
-webSocket.on('test', (data) => {
-    console.log(data);
 });
