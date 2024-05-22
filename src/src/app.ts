@@ -34,7 +34,7 @@ readdirSync(handlerDirs).forEach(async (file): Promise<void> => {
   handler.default(discordClient);
 });
 
-export const webSocket: Socket = io(Bun.env.WEBSOCKET_URL);
+export const webSocket: Socket = io(process.env.WEBSOCKET_URL);
 
 discordClient.login(process.env.TOKEN);
 
