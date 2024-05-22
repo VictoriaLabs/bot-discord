@@ -37,7 +37,7 @@ readdirSync(handlerDirs).forEach(async (file): Promise<void> => {
 export const webSocket: Socket = io(Bun.env.WEBSOCKET_URL, {
     transports: ['websocket']
  });
- 
+
 console.log(process.env.WEBSOCKET_URL);
 
 discordClient.login(process.env.TOKEN);
@@ -53,7 +53,8 @@ webSocket.on('connect', () => {
 // Handle incoming messages from the web socket server
 webSocket.on('discordEvent', async (data): Promise<void> => {
     const {type, payload} = data;
-
+    console.log(data);
+    
     switch (type) {
         case "pre-programmed-message":
             await sendPreProgrammedMessage(payload.data);
