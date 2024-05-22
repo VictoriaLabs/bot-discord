@@ -48,7 +48,7 @@ webSocket.on("connect_error", (err) => {
 
 webSocket.on('connect', () => {
     console.log('Connected to the web socket server');
-    socket.emit('join', "discord");
+    webSocket.emit('join', "discord");
 })
 
 // Handle incoming messages from the web socket server
