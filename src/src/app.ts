@@ -34,9 +34,13 @@ readdirSync(handlerDirs).forEach(async (file): Promise<void> => {
   handler.default(discordClient);
 });
 
+export const webSocket: Socket = io(Bun.env.WEBSOCKET_URL);
+
 discordClient.login(process.env.TOKEN);
 
-export const webSocket: Socket = io(Bun.env.WEBSOCKET_URL);
+webSocket.on('error', (error) => {
+    console.error('WebSocket error:', error);
+});
 
 webSocket.on('connect', () => {
     console.log('Connected to the web socket server');

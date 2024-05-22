@@ -3,7 +3,7 @@ services:
   bun:
     build: .
     ports:
-      - "8090:8090"
+      - "8085:8085"
     volumes:
       - ./src:/usr/src/app
     command: bash -c "bun install && bun run src/app.ts"
