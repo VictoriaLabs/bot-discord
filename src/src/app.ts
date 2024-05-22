@@ -39,9 +39,9 @@ console.log(process.env.WEBSOCKET_URL);
 
 discordClient.login(process.env.TOKEN);
 
-webSocket.on('error', (error) => {
-    console.error('WebSocket error:', error);
-});
+webSocket.on("connect_error", (err) => {
+    console.log(`connect_error due to ${err.message}`);
+  });
 
 webSocket.on('connect', () => {
     console.log('Connected to the web socket server');
