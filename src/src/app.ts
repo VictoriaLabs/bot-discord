@@ -69,6 +69,6 @@ webSocket.on('discordEvent', async (data): Promise<void> => {
     }
 });
 
-webSocket.on('test', (data) => {Ò
+webSocket.on('test', (data) => {
     console.log(data);
 });
